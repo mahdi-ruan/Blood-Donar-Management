@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.local
+*.log
+.DS_Store
+Lab 6 ( CSE 3206 – CO4 Reflection Essay).pdf
+deliverables/
+
