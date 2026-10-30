@@ -64,4 +64,5 @@ npm run build
 ## 6. AI Usage & Academic Integrity Disclosure
 In accordance with course guidelines, AI-assisted coding and documentation tools were used during development to assist with boilerplate scaffolding, test case generation, and Mermaid diagram formatting. All architectural decisions, design pattern selections, medical eligibility rules, and testing strategies were reviewed, verified, and understood by the author for live demonstration and viva defense.
 
-<!-- PR #2: Experimental 7-day auto-archive draft (requires revision to 30 days) -->
+<!-- PR #2: Experimental Revised: 30-day auto-archive window per reviewer feedback -->
+
