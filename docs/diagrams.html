@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BloodLink BDMS — UML Diagrams, Mock-up & Coverage Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #ffffff;
+      color: #0f172a;
+      margin: 0;
+      padding: 24px;
+    }
+    .capture-box {
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 40px;
+      background: #ffffff;
+      width: 1120px;
+    }
+    .capture-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+      margin-bottom: 18px;
+    }
+    /* Wireframe Mock-up Styling */
+    .wireframe-frame {
+      border: 2px dashed #64748b;
+      border-radius: 10px;
+      padding: 18px;
+      background: #f8fafc;
+      font-family: monospace;
+    }
+    .wf-header {
+      border: 2px solid #475569;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      background: #e2e8f0;
+      margin-bottom: 14px;
+      font-weight: bold;
+    }
+    .wf-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .wf-tab {
+      border: 1.5px solid #475569;
+      padding: 6px 12px;
+      background: #fff;
+      font-size: 12px;
+    }
+    .wf-tab.active {
+      background: #cbd5e1;
+      font-weight: bold;
+    }
+    .wf-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .wf-kpi {
+      border: 1.5px solid #64748b;
+      padding: 12px;
+      background: #fff;
+      text-align: center;
+    }
+    .wf-body {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 14px;
+    }
+    .wf-panel {
+      border: 1.5px solid #475569;
+      padding: 14px;
+      background: #fff;
+    }
+    .wf-input {
+      border: 1px solid #94a3b8;
+      padding: 6px;
+      margin: 6px 0;
+      background: #f1f5f9;
+      font-size: 12px;
+    }
+    /* Terminal Coverage Output */
+    .terminal-box {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: 'Consolas', 'Courier New', monospace;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+    .g { color: #4ade80; font-weight: bold; }
+    .c { color: #38bdf8; }
+    .y { color: #facc15; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. UML CLASS DIAGRAM -->
+  <div id="uml-class-diagram" class="capture-box">
+    <div class="capture-title">Figure 1: UML Class Diagram — 5 Functional Modules &amp; 4 GoF Design Patterns</div>
+    <div class="mermaid">
+classDiagram
+    class DatabaseService {
+        -static instance : DatabaseService
+        -storageKey : String
+        -state : Object
+        +static getInstance() DatabaseService
+        +getCollection(name) Array
+        +updateCollection(name, data) Promise
+        +resetToDefaults() Promise
+    }
+
+    class BloodSystemFactory {
+        +static createEntity(entityType, payload) Object
+    }
+
+    class DonorMatchingContext {
+        -strategy : MatchingStrategy
+        +setStrategy(strategy) void
+        +executeMatch(donors, bloodGroup) Array
+    }
+
+    class ExactMatchStrategy {
+        +findCompatibleDonors(donors, group) Array
+    }
+
+    class UniversalCompatibilityStrategy {
+        +static COMPATIBILITY_MAP : Object
+        +findCompatibleDonors(donors, group) Array
+    }
+
+    class BloodFulfillmentFacade {
+        -db : DatabaseService
+        +approveAndFulfillRequest(requestId) Promise
+    }
+
+    class AuthModule {
+        -authProvider : FirebaseAdapter
+        +loginWithGoogle() Promise
+        +loginAsAdmin(email, password) Object
+        +logout() Promise
+    }
+
+    class DonorModule {
+        -db : DatabaseService
+        +static checkMedicalEligibility(donor) Object
+        +registerDonor(donorData) Promise
+        +toggleDonorAvailability(donorId) Promise
+    }
+
+    class RequestModule {
+        -db : DatabaseService
+        +createBloodRequest(payload) Promise
+        +findMatchingDonors(group, mode) Array
+    }
+
+    class InventoryModule {
+        -db : DatabaseService
+        +getLowStockGroups() Array
+        +adjustStock(group, delta) Promise
+        +createCamp(payload) Promise
+    }
+
+    class AdminNotificationModule {
+        -db : DatabaseService
+        -fulfillmentFacade : BloodFulfillmentFacade
+        +fulfillBloodRequest(requestId) Promise
+        +updateRequestStatus(id, status) Promise
+        +getSystemSummary() Object
+    }
+
+    DonorMatchingContext --> ExactMatchStrategy : uses
+    DonorMatchingContext --> UniversalCompatibilityStrategy : uses
+    DonorModule --> DatabaseService : Singleton
+    DonorModule --> BloodSystemFactory : Factory
+    RequestModule --> DatabaseService : Singleton
+    RequestModule --> BloodSystemFactory : Factory
+    RequestModule --> DonorMatchingContext : Strategy
+    InventoryModule --> DatabaseService : Singleton
+    AdminNotificationModule --> BloodFulfillmentFacade : Facade
+    BloodFulfillmentFacade --> DatabaseService : Singleton
+    BloodFulfillmentFacade --> BloodSystemFactory : Factory
+    </div>
+  </div>
+
+  <!-- 2. USE CASE DIAGRAM -->
+  <div id="uml-usecase-diagram" class="capture-box">
+    <div class="capture-title">Figure 2: System Use Case Diagram (Actors: Donor/User via Google OAuth &amp; Fixed Admin)</div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Actors["System Actors"]
+        U["Regular User / Donor\n(Google Sign-In)"]
+        A["System Administrator\n(Fixed Credentials)"]
+    end
+
+    subgraph BDMS["BloodLink — Blood Donor Management System"]
+        UC1(["UC1: Authenticate via Google OAuth"])
+        UC2(["UC2: Register as Donor & Check 90-Day Eligibility"])
+        UC3(["UC3: Submit Emergency / Normal Blood Request"])
+        UC4(["UC4: Search Compatible Donors (Exact / Universal Strategy)"])
+        UC5(["UC5: Register for Voluntary Blood Donation Camp"])
+        UC6(["UC6: Authenticate via Fixed Admin Credentials"])
+        UC7(["UC7: Approve & Fulfill Blood Request (Facade Pattern)"])
+        UC8(["UC8: Adjust Blood Bank Inventory & Schedule Camps"])
+    end
+
+    U --> UC1
+    U --> UC2
+    U --> UC3
+    U --> UC4
+    U --> UC5
+
+    A --> UC6
+    A --> UC7
+    A --> UC8
+    A --> UC4
+    </div>
+  </div>
+
+  <!-- 3. AGILE INCREMENTAL PROCESS MODEL DIAGRAM -->
+  <div id="process-model-diagram" class="capture-box">
+    <div class="capture-title">Figure 3: Agile Incremental Process Model Adopted for BloodLink BDMS</div>
+    <div class="mermaid">
+flowchart LR
+    R["1. Requirements &\nUser Stories\n(5 Modules + Wireframe)"] --> D["2. Architecture &\nDesign Patterns\n(Singleton, Factory,\nStrategy, Facade)"]
+    D --> I1["Increment 1:\nAuth (Google + Fixed Admin)\n& Singleton DB"]
+    I1 --> I2["Increment 2:\nDonor Eligibility &\nBlood Request Matcher"]
+    I2 --> I3["Increment 3:\nInventory, Camps &\nAdmin Fulfillment Facade"]
+    I3 --> T["4. Automated Testing\n(Vitest TDD + Mocks\n+ Selenium E2E)"]
+    T --> CI["5. GitHub Actions CI\n& Release Deployment"]
+    </div>
+  </div>
+
+  <!-- 4. LOW-FIDELITY UI PROTOTYPE / MOCK-UP -->
+  <div id="ui-wireframe-mockup" class="capture-box">
+    <div class="capture-title">Figure 4: Initial Low-Fidelity UI Wireframe / Mock-up Prototype</div>
+    <div class="wireframe-frame">
+      <div class="wf-header">
+        <span>[LOGO] BloodLink BDMS — Blood Donor Management System</span>
+        <span>[Btn: Sign in with Google] [Btn: Admin Login (Fixed Email)]</span>
+      </div>
+      <div class="wf-tabs">
+        <div class="wf-tab active">[Tab 1] Overview &amp; Smart Matcher</div>
+        <div class="wf-tab">[Tab 2] Donor Directory &amp; 90-Day Eligibility</div>
+        <div class="wf-tab">[Tab 3] Emergency Blood Requests</div>
+        <div class="wf-tab">[Tab 4] Blood Bank Inventory &amp; Camps</div>
+        <div class="wf-tab">[Tab 5] Admin Control Center</div>
+      </div>
+      <div class="wf-kpis">
+        <div class="wf-kpi">TOTAL DONORS<br/><strong>[ 05 ]</strong><br/>Active Volunteers</div>
+        <div class="wf-kpi">BLOOD INVENTORY<br/><strong>[ 77 Bags ]</strong><br/>Across 8 ABO Groups</div>
+        <div class="wf-kpi">BLOOD REQUESTS<br/><strong>[ 03 ]</strong><br/>1 Pending | 1 Critical</div>
+        <div class="wf-kpi">DONATION CAMPS<br/><strong>[ 02 ]</strong><br/>Upcoming Drives</div>
+      </div>
+      <div class="wf-body">
+        <div class="wf-panel">
+          <strong>[Wireframe Panel A: Smart Compatibility Matcher]</strong>
+          <div class="wf-input">Select Patient Group: [ Dropdown: A+ / O- / AB+ ]</div>
+          <div class="wf-input">Select Strategy: [ Universal ABO Match | Exact Match ]</div>
+          <div class="wf-input">[Result Card] Tanvir Ahmed (O+) - Medically Eligible</div>
+          <div class="wf-input">[Result Card] Nusrat Jahan (O-) - Medically Eligible</div>
+        </div>
+        <div class="wf-panel">
+          <strong>[Wireframe Panel B: Central Blood Inventory &amp; Request Table]</strong>
+          <div class="wf-input">[Grid: A+ (14) | A- (4 LOW) | B+ (18) | B- (3 LOW) | O+ (22) | O- (5)]</div>
+          <div class="wf-input">[Table Row 1] REQ-2001 | Patient: Rafiqul | O+ (2 Bags) | CRITICAL | [Fulfill]</div>
+          <div class="wf-input">[Table Row 2] REQ-2002 | Patient: Sumaiya | A+ (1 Bag)  | NORMAL   | [Approved]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. VITEST TDD & V8 COVERAGE REPORT SUMMARY -->
+  <div id="vitest-coverage-screenshot" class="capture-box">
+    <div class="capture-title">Figure 5: Vitest TDD Unit Test Execution &amp; V8 Code Coverage Report</div>
+    <div class="terminal-box"><span class="c">$ npm run test:coverage</span>
+&gt; bloodlink-bdms@1.0.0 test:coverage
+&gt; vitest run --coverage
+
+<span class="g"> RUN  v2.1.9</span> D:/CSE/3-2/All Course/CSE 3206/lab6
+      Coverage enabled with v8
+
+ <span class="g">✓</span> tests/unit/bloodlink.tdd.test.js <span class="g">(13 tests)</span> 42ms
+   <span class="g">✓</span> 1. Design Patterns Verification (Singleton, Factory, Strategy, Facade) (4 passed)
+   <span class="g">✓</span> 2. External Dependency Isolation with Mocks (Firebase Auth, Cloud DB, SMS) (4 passed)
+   <span class="g">✓</span> 3. Functional Modules Unit Tests (Auth, Donor 90d Eligibility, Requests, Inventory, Admin) (5 passed)
+
+ <span class="g">Test Files  1 passed (1)</span>
+ <span class="g">     Tests  13 passed (13)</span>
+   Duration  2.91s
+
+ <span class="c">% Coverage report from v8</span>
+-------------------------|---------|----------|---------|---------|-------------------
+File                     | % Stmts | % Branch | % Funcs | % Lines | Status
+-------------------------|---------|----------|---------|---------|-------------------
+<span class="g">All files                |   94.71 |    77.89 |  100.00 |   94.71 | PASS (&gt;90% Target)</span>
+ modules                 |   97.87 |    81.05 |  100.00 |   97.87 |
+  adminNotificationMod   |   97.10 |    71.42 |  100.00 |   97.10 |
+  authModule.js          |   93.90 |    88.23 |  100.00 |   93.90 |
+  donorModule.js         |  100.00 |    90.47 |  100.00 |  100.00 |
+  inventoryModule.js     |  100.00 |    85.00 |  100.00 |  100.00 |
+  requestModule.js       |  100.00 |    66.66 |  100.00 |  100.00 |
+ patterns                |   96.55 |    81.48 |  100.00 |   96.55 |
+  DesignPatterns.js      |   96.55 |    81.48 |  100.00 |   96.55 |
+ services                |   71.79 |    35.71 |  100.00 |   71.79 |
+  firebaseConfig.js      |   71.79 |    35.71 |  100.00 |   71.79 |
+-------------------------|---------|----------|---------|---------|-------------------</div>
+  </div>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+</body>
+</html>
+
